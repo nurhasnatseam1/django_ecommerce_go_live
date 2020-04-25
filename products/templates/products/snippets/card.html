@@ -1,0 +1,15 @@
+<div class="card">
+      {% if instance.image %}
+            <a href="{{instance.get_absolute_url}}">
+                  <img class="card-img-top" src="{{instance.image.url}}" alt="Card image cap">
+            </a>
+      {% endif %}
+      <div class="card-body">
+            <div class="card-title">{{instance.title}}</div>
+            <div class="card-text">{{instance.description | truncatewords:10}}</div>
+            <a href='{% url "products:detail" slug=instance.slug %}' class="btn btn-primary">Go somewhere</a>
+      </div>
+</div>
+
+
+
