@@ -16,16 +16,18 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path,include
 from django.conf import settings
-from .views import base,login_page,register_page
+from .views import base
 from django.conf.urls.static import static
+from django.contrib.auth.views import LogoutView
 
-
+from accounts.views import login_page,register_page
 from cart.views import cart_home
 
 
 urlpatterns = [
     path("",base,name='base'),
     path("login/",login_page,name='login'),
+    path("logout/",LogoutView.as_view(),name='logout'),
     path("register/",register_page,name='register'),
     path('admin/', admin.site.urls),
     path('products/',include('products.urls')),

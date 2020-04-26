@@ -4,6 +4,8 @@ from django.shortcuts import render,redirect,HttpResponseRedirect
 
 from .models import Cart
 from products.models import Product
+from orders.models import Order 
+
 
 def cart_home(request):
 
@@ -40,3 +42,13 @@ def cart_update(request):
       else:
             cart_obj.products.add(product_obj)
       return redirect("cart:cart-home")
+
+
+
+def checkout_home(request):
+      cart_obj,cart_created=Cart.objects.new_or_get(request)
+      if  cart_created or cart_obj.products.count()==0:
+            return redirect("cart:cart-home")
+      else:
+            order_obj,new_order_obj=Order.objects.get_or_create(cart=cart_obj)
+      return render(request,'cart/checkout.html',{"object":order_obj})

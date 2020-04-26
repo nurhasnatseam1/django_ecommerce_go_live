@@ -1,4 +1,5 @@
 from django.db import models
+from decimal import Decimal
 from django.contrib.auth import get_user_model
 from django.db.models.signals import m2m_changed,pre_save
 # Create your models here.
@@ -70,9 +71,9 @@ m2m_changed.connect(cart_products_changed,sender=Cart.products.through)
 
 
 def pre_save_cart_receiver(sender,instance,*args,**kwargs):
-      supply_cost=10
+      tax=1.08
       if instance.subtotal>0:
-            instance.total=instance.subtotal+supply_cost; 
+            instance.total=Decimal(instance.subtotal)*Decimal(tax); 
       else:
             instance.total=0.0
 

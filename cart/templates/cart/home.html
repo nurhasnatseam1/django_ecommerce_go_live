@@ -31,6 +31,10 @@
             <th colspan="2"></th>
             <td>Total:{{cart.total}}</td>
       </tr>
+      <tr>
+            <th colspan="2"></th>
+            <td><a href="{% url 'cart:checkout' %}"><button class="btn btn-primary" >Checkout</button></a></td>
+      </tr>
 
       </tbody>
     </table>
