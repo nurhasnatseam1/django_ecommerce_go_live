@@ -20,6 +20,8 @@ from .views import base,login_page,register_page
 from django.conf.urls.static import static
 
 
+from cart.views import cart_home
+
 
 urlpatterns = [
     path("",base,name='base'),
@@ -27,6 +29,8 @@ urlpatterns = [
     path("register/",register_page,name='register'),
     path('admin/', admin.site.urls),
     path('products/',include('products.urls')),
+    path('search/',include('search.urls')),
+    path('cart/',include('cart.urls')),
 ]
 
 

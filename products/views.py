@@ -5,7 +5,7 @@ from django.views.generic import (ListView,
 
 
 from .models import Product 
-
+from cart.models import Cart 
 
 
 
@@ -20,8 +20,14 @@ class ProductDetailView(DetailView):
       template_name="products/product_detail.html"
       
 
+      def get_context_data(self,*args,**kwargs):
+            context=super().get_context_data(*args,**kwargs)
+            cart_obj,new_obj=Cart.objects.new_or_get(self.request)
+            context['cart']=cart_obj 
+            return context
+
       def get_object(self,*args,**kwargs):
-            obj = Product.objects.get(slug=self.kwargs.get('slug'))
+            obj = Product.objects.filter(slug=self.kwargs.get('slug')).first()
             if obj:
                   return obj 
             else:

@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+{% if request.GET.q %}
+
+<h2>You searched for : {{request.GET.q}}</h2>
+
+{% else %}
+
+<form action="{% url 'search:search' %}" class=" col-md-8 mx-auto">
+      <input class=" form-control" type="text" name="q">
+      <input class="btn btn-primary " type="submit" value="submit">
+</form>
+
+{% endif %}
+
+
+<div class="row">
+{% for obj in object_list %}
+
+      <div class="col-sm-6 col-md-4">
+            {% include 'products/snippets/card.html' with instance=obj %}
+      </div>
+
+{% empty %}
+      <h2>No products</h2>
+{% endfor %}
+</div>
+
+{% endblock content %}

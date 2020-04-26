@@ -2,9 +2,13 @@ import os
 from django.db import models
 import random
 from django.urls import reverse
+from django.db.models import Q
 from django.db.models.signals import post_save,pre_save
 from .utils import random_stirng_generator,unique_slug_generator 
 # Create your models here.
+
+
+
 
 
 def get_filename_ext(filename):
@@ -30,7 +34,8 @@ class ProductsCustomQuerySet(models.query.QuerySet):
       def featured(self):
             return self.filter(featured=True,active=True)
 
-      
+      def search(self,query):
+            return self.filter(Q(title__icontains=query)|Q(description__icontains=query)|Q(tags__title__icontains=query)).distinct()
 
 
 
@@ -50,8 +55,13 @@ class ProductModelManager(models.Manager):
             return self.get_queryset().featured()
       
       def all(self):
-            return self.get_queryset().active()
+            return self.get_queryset().active()#get_queryset() returns all products 
 
+      def search(self,query):
+            if query is not None:
+                  qs=Product.objects.featured().search(query)
+                  return qs
+            return Product.objects.featured()
 
 class Product(models.Model):
       title       = models.CharField(max_length=120)
