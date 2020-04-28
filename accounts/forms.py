@@ -31,3 +31,8 @@ class RegisterForm(forms.Form):
             if password_2_value != password_value:
                   raise forms.ValidationError("password and password_2 fields values do not match")
             return password_2_value
+
+
+
+class GuestForm(forms.Form):
+      email=forms.EmailField()

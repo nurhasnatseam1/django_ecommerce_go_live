@@ -49,3 +49,8 @@ def register_page(request):
                         login(request,user)
                         return redirect('login')
       return render(request,"accounts/register.html",context)
+
+
+
+
+      

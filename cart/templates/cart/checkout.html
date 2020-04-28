@@ -1,9 +1,85 @@
 {% extends 'base.html' %}
-
-{% comment %} here order is object {% endcomment %}
+{% url 'login' as login_url  %}
+{% url 'guest_login' as guest_login_url %} these will not be read by django template engine 
 {% block content %}
-      <h1>Checkout</h1>
-      <p>Cart total:{{object.cart.total}}</p>
-      <p>Shipping Total:{{object.shipping_total}}</p>
-      <p>Order Total:{{object.order_total}}</p>
+
+
+order_id:{{object.id}}
+cart_id:{{object.cart.id}}
+{% if not billing_profile %}
+      <div class="row">
+            <div class="col-12 col-md-6">
+                  <h2 class="lead" >proceed as authenticated</h2>
+                  {% url 'login' as login_url  %}
+                  {% include 'cart/snippets/form.html' with form=login_form  next=request.build_absolute_uri action_url=login_url %}    {% comment %} build absolute uri = root relative uri{% endcomment %}
+            </div>
+            <div class="col-12 col-md-6">
+                  <h2 class="lead" >proceed as guest</h2>
+                  {% url 'guest_login' as guest_login_url %}
+                  {% include 'cart/snippets/form.html' with form=guest_form  next=request.build_absolute_uri action_url=guest_login_url %}
+            </div>
+      </div>
+      
+
+      </div>
+
+
+
+
+{% else %}
+      {% if not object.shipping_address %}
+      <div class="row">
+            <div class="col-12 col-md-6 mx-auto">
+                  <h2 class="lead">Shipping Address</h2>
+                  <hr>
+                  <div class="row">
+                        <div class="col-6">
+                              {% url 'checkout-address' as checkout_address %}
+                              {% include 'cart/snippets/form.html' with form=address_form  next=request.build_absolute_uri action_url=checkout_address address_type='shipping' %}    {% comment %} build absolute uri = root relative uri{% endcomment %}
+                        </div>
+                        {% url 'checkout-address-reuse' as checkout_address_reuse %}
+                        {% include 'address/snippets/prev_addresses.html' with address_qs=address_qs next_url=request.build_absolute_uri address_type='shipping' action_url=checkout_address_reuse %}
+                        
+                  </div>
+                  
+
+            </div>
+      </div>
+      {% elif not object.billing_address %}
+      <div class="row">
+            <div class="col-12 col-md-6 mx-auth">
+                  <h2 class="lead">billing Address</h2>
+                  <hr>
+                  <div class="row">
+                        <div class="col-6">
+                              {% url 'checkout-address' as checkout_address %}
+                              {% include 'cart/snippets/form.html' with form=address_form  next=request.build_absolute_uri action_url=checkout_address address_type='billing' %}    {% comment %} build absolute uri = root relative uri{% endcomment %}
+                        </div>
+                        {% url 'checkout-address-reuse' as checkout_address_reuse %}
+                        {% include 'address/snippets/prev_addresses.html' with address_qs=address_qs next_url=request.build_absolute_uri address_type='billing' action_url=checkout_address_reuse %}
+                        
+                  </div>
+            </div>
+      </div>
+      {% else %}
+
+            {% comment %} here order is object {% endcomment %}
+            <h1>Checkout</h1>
+            <p>shipping address:{{object.shipping_address.address_line_1}}</p>
+            <p>billing_address:{{object.billing_address.address_line_2}}</p>
+            <p>Cart total:{{object.cart.total}}</p>
+            <p>Shipping Total:{{object.shipping_total}}</p>
+            <p>Order Total:{{object.order_total}}</p>
+            <form action="" method="POST">
+                  {% csrf_token %}
+                  <input type="submit" value="shop now">
+            </form>
+      {% endif %}
+      
+
+{% endif %}
+
 {% endblock content %}
+
+
+
