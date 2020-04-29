@@ -1,0 +1,58 @@
+[
+{
+   "model": "products.product",
+   "pk": 3,
+   "fields": {
+      "title": "product 1",
+      "slug": "product-1",
+      "description": "this is product one",
+      "price": "39.99",
+      "image": "products/None/40046844..png",
+      "featured": true,
+      "active": true,
+      "timestamp": "2020-04-24T16:05:36.664Z"
+   }
+},
+{
+   "model": "products.product",
+   "pk": 4,
+   "fields": {
+      "title": "product2",
+      "slug": "product2",
+      "description": "this is product two",
+      "price": "39.99",
+      "image": "products/None/53711284..png",
+      "featured": true,
+      "active": true,
+      "timestamp": "2020-04-24T16:05:36.664Z"
+   }
+},
+{
+   "model": "products.product",
+   "pk": 5,
+   "fields": {
+      "title": "product 3",
+      "slug": "product-3",
+      "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae adipisci quidem perferendis reprehenderit possimus? Repellendus ipsa, porro cumque voluptas dolore inventore nostrum quisquam ipsam rerum voluptatibus adipisci explicabo nesciunt odit.",
+      "price": "39.99",
+      "image": "products/None/59823734..png",
+      "featured": true,
+      "active": true,
+      "timestamp": "2020-04-24T16:05:36.664Z"
+   }
+},
+{
+   "model": "products.product",
+   "pk": 6,
+   "fields": {
+      "title": "product 4",
+      "slug": "product-4",
+      "description": "this product was created only for testing the tag",
+      "price": "39.99",
+      "image": "products/None/58060356..png",
+      "featured": true,
+      "active": true,
+      "timestamp": "2020-04-25T14:24:33.038Z"
+   }
+}
+]

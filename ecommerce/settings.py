@@ -45,7 +45,10 @@ INSTALLED_APPS = [
     "accounts",
     "billing",
     "address",
+    "analytics",
 ]
+
+AUTH_USER_MODEL='accounts.User'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

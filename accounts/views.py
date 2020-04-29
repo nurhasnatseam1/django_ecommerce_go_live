@@ -8,6 +8,7 @@ from django.utils.http import is_safe_url
 
 from .models import GuestEmail 
 
+User=get_user_model()
 
 def login_page(request):
       context={}
@@ -47,19 +48,21 @@ def register_page(request):
 
       if request.method == "POST":
             if form.is_valid():
-                  username=form.cleaned_data.get("username")
+                  email=form.cleaned_data.get("email")
                   password=form.cleaned_data.get("password")
                   email=form.cleaned_data.get("email")
 
-                  user=authenticate(username=username,password=password)
+                  user=authenticate(email=email,password=password)
 
                   if user is not None:
                         login(request,user)
-                        return redirect('login')
+                        return redirect('products:list')
                   else:
-                        user=User.objects.create(username=username,password=password,email=email)
+                        user=User.objects.create(email=email)
+                        user.set_password(password)
+                        user.save()
                         login(request,user)
-                        return redirect('login')
+                        return redirect('products:list')
       return render(request,"accounts/register.html",context)
 
 

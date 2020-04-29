@@ -6,8 +6,8 @@ from django.views.generic import (ListView,
 
 from .models import Product 
 from cart.models import Cart 
-
-
+from analytics.signals import object_viewed_signal
+from analytics.mixins import ObjectViewedMixin
 
 class ProductListView(ListView):
       queryset          = Product.objects.all()
@@ -15,7 +15,7 @@ class ProductListView(ListView):
 
 
 
-class ProductDetailView(DetailView):
+class ProductDetailView(ObjectViewedMixin,DetailView):
       queryset=Product.objects.all()
       template_name="products/product_detail.html"
       
@@ -47,7 +47,7 @@ class ProductFeaturedListView(ListView):
 
 
 
-class ProductFeaturedDetailView(DetailView):
+class ProductFeaturedDetailView(ObjectViewedMixin,DetailView):
       template_name="products/product_detail.html"
 
       def get_queryset(self,*args,**kwargs):
