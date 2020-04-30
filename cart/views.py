@@ -10,6 +10,14 @@ from billing.models import BillingProfile
 from accounts.models import GuestEmail
 from address.forms import AddressModelForm
 from address.models import Address
+from django.http import JsonResponse
+
+
+
+def cart_detail_api_view(request):
+      cart_obj,new_obj =Cart.objects.new_or_get(request)
+      products=[{'title':x.title,'price':x.price,'slug':x.slug,'id':x.id} for x in cart_obj.products.all()] #you can do this, or import rest framework and serialize the cart object
+      return JsonResponse({'products':products,'subtotal':cart_obj.subtotal,'total':cart_obj.total})
 
 def cart_home(request):
 
@@ -42,9 +50,16 @@ def cart_update(request):
       product_obj=Product.objects.get(id=request.POST.get("product"))
       cart_obj,new_obj=Cart.objects.new_or_get(request)
       if product_obj in cart_obj.products.all():
+            product_added=False
             cart_obj.products.remove(product_obj)
       else:
             cart_obj.products.add(product_obj)
+            product_added=True
+      if request.is_ajax():
+            return JsonResponse({
+                  "added":product_added,
+                  "removed":not product_added,
+            })
       return redirect("cart:cart-home")
 
 

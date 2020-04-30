@@ -5,7 +5,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType 
 
 # Create your models here.
-
+from .utils import get_client_ip
 from .signals import object_viewed_signal
 
 User=settings.AUTH_USER_MODEL
@@ -37,7 +37,7 @@ def object_viewed_receiver(sender,instance,request,*args,**kwargs):
       c_type=ContentType.objects.get_for_model(sender) #here sender = instance.__class__
       new_view_obj=ObjectViewed.objects.create(
             user=request.user,
-            ip_address=get_client_ip(request)
+            ip_address=get_client_ip(request),
             content_type=c_type,
             object_id=instance.id,
       )

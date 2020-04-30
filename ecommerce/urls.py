@@ -21,7 +21,7 @@ from django.conf.urls.static import static
 from django.contrib.auth.views import LogoutView
 
 from accounts.views import login_page,register_page,guest_login_view
-from cart.views import cart_home
+from cart.views import cart_home,cart_detail_api_view
 from address.views import checkout_address_create_view,checkout_address_reuse_view
 from orders.views import order_sucess
 urlpatterns = [
@@ -37,6 +37,7 @@ urlpatterns = [
     path('checkout/address/create/',checkout_address_create_view,name='checkout-address'),
     path("checkout/address/reuse/",checkout_address_reuse_view,name="checkout-address-reuse"),
     path("order/success",order_sucess,name="order-success"),
+    path("api/cart/",cart_detail_api_view,name='cart-api'),
 ]
 
 
