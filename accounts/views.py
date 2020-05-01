@@ -6,7 +6,7 @@ from django.utils.http import is_safe_url
 # Create your views here.
 
 
-from .models import GuestEmail 
+from .models import GuestEmail
 
 User=get_user_model()
 
@@ -21,10 +21,10 @@ def login_page(request):
       print(request.POST)
       if request.method=="POST":
             if form.is_valid():
-                  username=form.cleaned_data.get("username")
+                  email=form.cleaned_data.get("email")
                   password=form.cleaned_data.get("password")
 
-                  user=authenticate(username=username,password=password)
+                  user=authenticate(email=email,password=password)
                   print(user)
                   print(redirect_path)
 
@@ -72,11 +72,11 @@ def guest_login_view(request):
       form = GuestForm(request.POST or None)
 
       context={
-            "form":form 
+            "form":form
       }
       next_ =request.GET.get('next')
       next_post=request.POST.get('next')
-      redirect_path=next_ or next_post or None 
+      redirect_path=next_ or next_post or None
 
       if form.is_valid():
             email=form.cleaned_data.get("email")
@@ -86,6 +86,5 @@ def guest_login_view(request):
                   return redirect(redirect_path)
             else:
                   return redirect("/")
-            
+
       return redirect("register")
-            

@@ -15,12 +15,8 @@
             {% endblock content %}
       </div>
       {% include 'base/js.html' %}
-      <script src="{% static 'async/async.js' %}"></script>
+
+      {% block script %}{% endblock script %}
+
 </body>
-</html> 
-
-
-
-
-
-
+</html>

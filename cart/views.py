@@ -106,9 +106,13 @@ def checkout_home(request):
       if request.method == "POST":
             is_done = order_obj.check_done()
             if is_done:
-                  order_obj.mark_paid()
-                  del request.session['cart_id']
-                  return redirect('/order/success')
+                  charge_paid,charge_msg=billing_profile.charge(order_obj)
+                  if charge_paid:
+                        order_obj.mark_paid()
+                        del request.session['cart_id']
+                        return redirect('/order/success') 
+                  else:
+                        print('charge was not paid to stripe via card')  
       context={
             "object":order_obj,
             "cart":cart_obj,
