@@ -144,3 +144,7 @@ MEDIA_ROOT=os.path.join(os.path.dirname(BASE_DIR),"static_cdn","media_root")
 
 
 LOGOUT_REDIRECT_URL='/login'
+
+
+STRIPE_SECRET_KEY='sk_test_HwvAUIsohGImpP7zwFEZvO6q00xd5DlMjJ'
+STRIPE_PUB_KEY='pk_test_Q9ekfzPOPmbrzSluWQO8e5CT00nBpE2Xkk'

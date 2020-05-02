@@ -1,5 +1,5 @@
 from django.shortcuts import render,redirect,HttpResponseRedirect
-
+from django.conf import settings
 # Create your views here.
 
 from .models import Cart
@@ -63,7 +63,7 @@ def cart_update(request):
       return redirect("cart:cart-home")
 
 
-
+STRIPE_PUB_KEY=settings.STRIPE_PUB_KEY
 def checkout_home(request):
       cart_obj,cart_created=Cart.objects.new_or_get(request)
       if  cart_created or cart_obj.products.count()==0:
@@ -82,7 +82,7 @@ def checkout_home(request):
       print('billing_address_id',billing_address_id)
       print(request.session)
 
-
+      has_card=False
 
       billing_profile,billing_profile_created=BillingProfile.objects.new_or_get(request)
 
@@ -98,10 +98,12 @@ def checkout_home(request):
                   del request.session["billing_address_id"] 
             if billing_address_id or shipping_address_id:
                   order_obj.save()
+            has_card=billing_profile.has_card
       else:
             order_obj=None
             address_qs=None
 
+      
 
       if request.method == "POST":
             is_done = order_obj.check_done()
@@ -110,6 +112,9 @@ def checkout_home(request):
                   if charge_paid:
                         order_obj.mark_paid()
                         del request.session['cart_id']
+                        if not billing_profile.user:
+                              billing_profile.set_cards_inactive()
+                        del request.session['guest_email_id']
                         return redirect('/order/success') 
                   else:
                         print('charge was not paid to stripe via card')  
@@ -122,5 +127,7 @@ def checkout_home(request):
             "login_form":login_form,
             "guest_form":guest_form,
             "address_qs":address_qs,
+            "has_card":has_card,
+            "publish_key":STRIPE_PUB_KEY,
             }
       return render(request,'cart/checkout.html',context)

@@ -52,6 +52,23 @@ class BillingProfile(models.Model):
     def charge(self,order_obj,card=None):
         return Charge.objects.do(self,order_obj,card)
 
+    def set_cards_inactive(self):
+        cards_qs=self.get_cards()
+        cards_qs.update(active=False)
+        return cards_qs.filter(active=True).count()
+
+    @property
+    def has_card(self):
+        instance=self 
+        card_qs=instance.card_set.all()
+        return card_qs.exists()
+    def get_cards(self):
+        return self.card_set.all()
+    @property
+    def get_default_card(self):
+        card_qs=self.get_cards()
+        return card_qs.filter(default=True,active=True).first()
+
 
 
 
@@ -80,10 +97,14 @@ post_save.connect(user_created_receiver,sender=User)
 
 
 class CardManager(models.Manager):
+    def all(self,*args,**kwargs):
+        return self.get_queryset().filter(active=True)
+    
     def add_new(self,billing_profile,token=None):
         if token is not None:
             customer=stripe.Customer.retrieve(billing_profile.customer_id)
             card_information=customer.sources.create(source=token)
+            stripe_card=card_information
             if str(stripe_card.object)=="card":
                 new_card=self.model(
                 billing_profile=billing_profile,
@@ -108,14 +129,24 @@ class Card(models.Model):
     exp_year=models.IntegerField(null=True,blank=True)
     last4=models.CharField(max_length=20,null=True,blank=True)
     default=models.BooleanField(default=True)
+    active=models.BooleanField(default=True)
+    timestamp=models.DateTimeField(auto_now_add=True)
     objects=CardManager()
 
     def __str__(self):
-        return f"{self.stripe_id} last4:{self.last4}"
+        return f"{self.stripe_card_id} last4:{self.last4}"
 
 
 
+def post_save_card_receiver(sender,instance,created,*args,**kwargs):
+    if instance.default:
+        billing_profile=instance 
+        qs=Card.objects.filter(billing_profile=billing_profile).exclude(pk=instance.pk)
+        qs.update(default=False)
 
+
+
+post_save.connect(post_save_card_receiver,sender=Card)
 
 
 class ChargeManager(models.Manager):

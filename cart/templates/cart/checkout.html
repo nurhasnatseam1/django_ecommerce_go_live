@@ -62,18 +62,25 @@ cart_id:{{object.cart.id}}
             </div>
       </div>
       {% else %}
+            {% if not has_card %}
 
-            {% comment %} here order is object {% endcomment %}
-            <h1>Checkout</h1>
-            <p>shipping address:{{object.shipping_address.address_line_1}}</p>
-            <p>billing_address:{{object.billing_address.address_line_2}}</p>
-            <p>Cart total:{{object.cart.total}}</p>
-            <p>Shipping Total:{{object.shipping_total}}</p>
-            <p>Order Total:{{object.order_total}}</p>
-            <form action="" method="POST">
-                  {% csrf_token %}
-                  <input type="submit" value="shop now">
-            </form>
+                  {% include 'billing/snippets/embedded_card.html' %}
+
+            {% else %}
+
+                  {% comment %} here order is object {% endcomment %}
+                  <h1>Checkout</h1>
+                  <p>shipping address:{{object.shipping_address.address_line_1}}</p>
+                  <p>billing_address:{{object.billing_address.address_line_2}}</p>
+                  <p>Cart total:{{object.cart.total}}</p>
+                  <p>Shipping Total:{{object.shipping_total}}</p>
+                  <p>payment method:{{billing_profile.get_default_card}} <a href="{url 'billing-payment-method'}?next={{request.build_absolute_uri}}">change payment method</a></p>
+                  <p>Order Total:{{object.order_total}}</p>
+                  <form action="" method="POST">
+                        {% csrf_token %}
+                        <input type="submit" value="shop now">
+                  </form>
+            {% endif %}
       {% endif %}
       
 
