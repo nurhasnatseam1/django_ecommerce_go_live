@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "django.contrib.sites",
     "products",
     "search",
     "tags",
@@ -48,7 +49,14 @@ INSTALLED_APPS = [
     "analytics",
 ]
 
+SITE_ID=1
+
 AUTH_USER_MODEL='accounts.User'
+LOGIN_URL='/account/login/'
+LOGIN_REDIRECT_URL='/'
+LOGOUT_URL='/account/logout/'
+LOGOUT_REDIRECT_URL='/account/login/'
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -143,8 +151,23 @@ MEDIA_ROOT=os.path.join(os.path.dirname(BASE_DIR),"static_cdn","media_root")
 
 
 
-LOGOUT_REDIRECT_URL='/login'
 
 
 STRIPE_SECRET_KEY='sk_test_HwvAUIsohGImpP7zwFEZvO6q00xd5DlMjJ'
 STRIPE_PUB_KEY='pk_test_Q9ekfzPOPmbrzSluWQO8e5CT00nBpE2Xkk'
+
+
+""" EMAIL_HOST='smtp.gmail.com'
+EMAIL_HOST_USER='nurhasnatseam2@gmail.com'
+EMAIL_HOST_PASSWORD='nazrulislam'
+EMAIL_PORT=587
+EMAIL_USE_TLS=True
+DEFAULT_FROM_EMAIL='PYHON ECOMMERCE FROM YOUR SERVER' """
+
+
+#email settings for local use all the email would be sent to local file
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+EMAIL_FILE_PATH = 'tmp/email-messages/'
+
+
+

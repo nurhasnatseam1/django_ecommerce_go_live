@@ -40,3 +40,28 @@ def unique_order_id_generator(instance,new_order_id=None):
             return unique_order_id_generator(instance,new_order_id=new_order_id)
       
       return order_id
+
+
+
+
+
+
+
+
+def unique_activation_key_generator(instance,new_activation_key=None):
+      print('unique activation key  generator')
+      if new_activation_key is not None:
+            activation_key=new_activation_key
+      else:
+            activation_key = slugify(random_string_generator())
+
+      Klass=instance.__class__
+      qs_exists=Klass.objects.filter(key=activation_key).exists()
+
+      if qs_exists:
+            size=random.randint(30,45)
+            new_activation_key=f"{activation_key}-{random_string_generator(size=size)}"
+
+            return unique_activation_key_generator(instance,new_activation_key=new_activation_key)
+      
+      return activation_key

@@ -74,6 +74,15 @@ class RegisterForm(forms.Form):
             return password_2_value
 
 
+      def save(self,commit=True):
+            user=super().save(commit=False)
+            user.set_password(self.cleaned_data.get('password'))
+            user.is_active=False 
+            if commit:
+                  user.save()
+            return user
+
+
 
 class GuestForm(forms.Form):
       email=forms.EmailField()

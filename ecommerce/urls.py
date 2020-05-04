@@ -19,7 +19,7 @@ from django.conf import settings
 from .views import base
 from django.conf.urls.static import static
 from django.contrib.auth.views import LogoutView
-
+from django.views.generic import RedirectView
 from billing.views import payment_method_view,payment_method_create_view
 from accounts.views import login_page,register_page,guest_login_view
 from cart.views import cart_home,cart_detail_api_view
@@ -27,10 +27,7 @@ from address.views import checkout_address_create_view,checkout_address_reuse_vi
 from orders.views import order_sucess
 urlpatterns = [
     path("",base,name='base'),
-    path("login/",login_page,name='login'),
-    path("logout/",LogoutView.as_view(),name='logout'),
-    path("guest_login/",guest_login_view,name='guest_login'),
-    path("register/",register_page,name='register'),
+
     path('admin/', admin.site.urls),
     path('products/',include('products.urls')),
     path('search/',include('search.urls')),
@@ -41,7 +38,12 @@ urlpatterns = [
     path("api/cart/",cart_detail_api_view,name='cart-api'),
     path('billing/payment-method/',payment_method_view,name='billing-payment-method'),
     path("billing/payment-method/create/",payment_method_create_view,name='billing-payment-method-endpoint'),
-]
+    path('accounts/',RedirectView.as_view(url='/account/')),
+    path('settings/',RedirectView.as_view(url='/account/')),
+    path("account/",include("accounts.urls")),
+    path('account/password/',include('accounts.passwords.urls')),
+
+    ]
 
 
 

@@ -4,7 +4,7 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 # Register your models here.
 
-from .models import GuestEmail 
+from .models import GuestEmail ,EmailActivationForLogin
 from .forms import UserAdminCreationForm,UserAdminChangeForm
 User=get_user_model() #gives you the current User model , that one you setted up in settngs.py
 
@@ -20,7 +20,7 @@ class UserAdmin(BaseUserAdmin):
       fieldsets=(
             (None,{"fields":('email','password')}),
             ("Personal info",{'fields':('full_name',)}),
-            ("Permissions",{'fields':('admin','is_adim')}),
+            ("Permissions",{'fields':('admin',)}),
 
       )
       add_fieldsets=(
