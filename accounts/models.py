@@ -2,18 +2,23 @@ from django.db import models
 from django.contrib.auth.models import (
       AbstractBaseUser,BaseUserManager
 )
-
+from datetime import timedelta
+from django.utils import timezone
+from django.conf import settings
 from django.contrib.auth.models import PermissionsMixin
 from django.core.mail import send_mail
 from django.template.loader import get_template #get_template associates the html strings with passed in context variables
 from django.conf import settings
 from django.db.models.signals import pre_save,post_save
 from django.contrib.sites.models import Site
+from django.db.models.query import Q
 # Create your models here.
 
 from ecommerce.utils import random_string_generator,unique_activation_key_generator
 
 
+
+DEFAUTL_EXPIRE_AFTER_DAYS=7
 
 class UserManager(BaseUserManager):
       def create_user(self,email,password=None,is_staff=False,is_admin=False,is_active=True):
@@ -46,7 +51,6 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser,PermissionsMixin):
       email=models.EmailField(unique=True,max_length=255)
       full_name=models.CharField(max_length=255,blank=True,null=True)
-      active=models.BooleanField(default=True)
       is_active=models.BooleanField(default=True)
       staff=models.BooleanField(default=False)
       admin=models.BooleanField(default=False)
@@ -81,11 +85,30 @@ class User(AbstractBaseUser,PermissionsMixin):
       def is_superuser(self):
             return self.admin
 
+#forced expired means temporarily expired by administrator
+class EmailActivationForLoginQuerySet(models.query.QuerySet):
+      def confirmable(self):
+            now=timezone.now()
+            start_range=now-timedelta(days=DEFAUTL_EXPIRE_AFTER_DAYS)
+            end_range=now
+            return self.filter(
+                  activated=False,
+                  forced_expired=False
+            ).filter(
+                  timestamp__gte=start_range,
+                  timestamp__lte=now
+            )
 
+class EmailActivationForLoginManager(models.Manager):
+      
+      def get_queryset(self):
+            return EmailActivationForLoginQuerySet(self.model,using=self._db)
 
+      def confirmable(self):
+            return self.get_queryset().confirmable()
 
-
-
+      def email_exists(self,email):
+            return self.get_queryset().filter(Q(email=email) | Q(user__email=email)).filter(activated=False)
 
 class EmailActivationForLogin(models.Model):
       user=models.ForeignKey(User,on_delete=models.CASCADE)
@@ -97,10 +120,26 @@ class EmailActivationForLogin(models.Model):
       timestamp=models.DateTimeField(auto_now_add=True)
       updated=  models.DateTimeField(auto_now=True)
 
-
+      objects=EmailActivationForLoginManager()
       def __str__(self):
             return self.email
 
+      def can_activate(self):
+            qs=EmailActivationForLogin.filter(pk=self.pk).confirmable()
+            if qs.exists():
+                  return True 
+            return False
+
+
+      def activate(self):
+            if self.can_activate():
+                  user=self.user 
+                  user.is_active=True 
+                  user.save()
+                  self.activate=True 
+                  self.save()
+                  return True 
+            return False
 
 
       def regenerate(self):
@@ -112,7 +151,7 @@ class EmailActivationForLogin(models.Model):
                   return False
 
 
-      def send_activatation(self):
+      def send_activation(self):
             if not self.activated and not self.forced_expired:
                   if self.key:
                         base_url=Site.objects.get_current().domain

@@ -9,7 +9,16 @@
 </head>
 <body>
       {% include 'snippets/navbar.html'  %}
+
       <div class="container">
+            {% if messages %}
+                  {% for message in messages %}
+                  <span {% if message.tags %} class={{message.tag}} {% endif %} >
+                        {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}Inportant:{% endif %}
+                        {{message}}<br/>
+                  </span>
+                  {% endfor %}
+            {% endif %}
             {% block content %}
 
             {% endblock content %}

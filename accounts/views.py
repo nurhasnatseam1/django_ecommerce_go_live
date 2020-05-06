@@ -1,6 +1,6 @@
 
 from django.shortcuts import render,redirect,HttpResponseRedirect
-from .forms import LoginForm,RegisterForm,GuestForm
+from .forms import OldLoginForm,ImprovedLoginForm,RegisterForm,GuestForm
 from django.contrib.auth import authenticate,login,get_user_model
 from django.utils.http import is_safe_url
 from django.views.generic import DetailView,FormView
@@ -8,9 +8,15 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
-from django.views.generic import FormView,CreateView
+from django.views.generic import View,FormView,CreateView
+from django.urls import reverse 
+from django.utils.safestring import mark_safe
 
 
+
+from .models import EmailActivationForLogin
+from .forms import ReactivateEmailForm
+from ecommerce.mixins import NextUrlMixin
 # Create your views here.
 #difference between form view and create and update view is (create and update view has form_valid method built in on them )
 #use create and update view when working with a model or when you do not need power over how the form is validating
@@ -41,7 +47,7 @@ class AccountHomeView(LoginRequiredMixin,DetailView):
 
 def login_page(request):
       context={}
-      form=LoginForm(request.POST or None)
+      form=OldLoginForm(request.POST or None)
       context["form"]=form
       print(request.GET)
       next_=request.GET.get('next')
@@ -68,10 +74,51 @@ def login_page(request):
                         return redirect("login")
       return render(request,"accounts/login.html",context)
 
-class LoginView(FormView):
-      form_class=LoginForm 
+
+
+
+
+
+class ImprovedLoginView(NextUrlMixin,FormView):
+      form_class=ImprovedLoginForm 
       success_url='/'
       template_name='accounts/login.html'
+
+
+      #this is equavalent to form=formClass(arguments:request.POST)
+      def get_form_kwargs(self):
+            kwargs=super().get_form_kwargs()
+            kwargs['request']=self.request
+            return kwargs
+
+
+      def form_valid(self,form):
+            request=self.request 
+            user=form.user 
+            if user is not None:
+                  if not user.is_active:
+                        return super().form_invalid(form)
+                  if user.is_authenticated:
+                        next_path=self.get_next_url()
+                        return redirect(next_path)
+            return super().form_invalid(form)
+
+
+
+
+
+
+class OldLoginView(FormView):
+      form_class=OldLoginForm 
+      success_url='/'
+      template_name='accounts/login.html'
+
+
+      #this is equavalent to form=formClass(arguments:request.POST)
+      def get_form_kwargs(self):
+            kwargs=super().get_form_kwargs()
+            kwargs['request']=self.request
+            return kwargs
 
 
       def form_valid(self,form):
@@ -164,5 +211,50 @@ class RegisterView(CreateView):
 
 
 
-def ActivateAccount(request):
-      pass
+class ActivateAccountView(View):
+      key=None
+      def get(self,request,key=None,*args,**kwargs):
+            self.key=key
+            if key is not None:
+                  qs=EmailActivationForLogin.objects.confirmable().filter(key__iexact=key)
+                  confirm_qs=qs.confirmable()
+                  if confrim_qs.count()==1:
+                        obj=confirm_qs.first()
+                        obj.activate()
+                        messages.success(request,"you have activated your account,enjoy our site")
+                        return redirect('login')
+                  else:
+                        activated_qs=qs.filter(activated=True) 
+                        if activated.exists():
+                              reset_link=reverse("password_reset")
+                              msg=f"""
+                              your email has already been confirmed,
+                              do you want to change your password
+                              then go there <a href='{reset_link}' >change password</a>
+                              """
+                              messages.success(request,mark_safe(msg))
+                              return redirect("login")
+            
+            context={
+                  "form":ReactivateEmailForm(),
+                  "key":key
+            }
+            return render(request,'registration/activtion-error.html',context)
+
+      def post(self,request,*args,**kwargs):
+            form = ReactivateEmailForm(request.POST or None)
+            if form.is_vaild():
+                  email=form.cleaned_data.get('email')
+                  qs=EmailActivationForLogin.objects.email_exists(email=email)
+                  obj=qs.first()
+                  user=obj.user 
+                  obj.regenerate()
+                  obj.send_activation()
+                  messages.success(request,mark_safe('your activation link has sent to your email'))
+            else:
+                  messages.error(request,"there was a problem parsing your email address")
+            context={
+                  "form":form,
+            }
+            #if there is and error in the form the form validation will be shown by the help of the form object itself
+            return render(request,'registration/activation-error.html',context)

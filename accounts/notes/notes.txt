@@ -1,0 +1,25 @@
+pass request data to model object manager by object.methods(self,args)
+pass additinal  request data to form class through form kwargs form=FormClass(request=self.request) in class based views use get_form_kwargs to pass data to from as kwargs but you have to redefine __init__ of form 
+      example:
+
+            class LoginForm(forms.Form):
+                  email = forms.EmailField(label='email')
+                  password =forms.CharField(widget=forms.PasswordInput)
+
+                  def __init__(self,request, *args, **kwargs):
+                        self.request=request
+                        super().__init__(*args,**kwargs)
+
+            using :
+                  form = LoginForm(request=request,request.POST or None)
+
+                  if class View :
+
+                  class LoginView(FormView):
+
+                        form_class=LoginForm 
+
+                        def get_form_kwargs(self):
+                              kwargs=super().get_form_kwargs()
+                              kwargs['request]=request
+                              return kwargs
