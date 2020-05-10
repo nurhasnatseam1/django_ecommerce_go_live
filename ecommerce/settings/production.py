@@ -98,7 +98,11 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
-
+#OVERRIDING SQLLITE DATA BASE FOR PRODUCTIOON POSTGRESQL
+import dj_database_url
+db_from_end=dj_database_url.config() 
+DATABASES['default'].update(db_from_env)
+DATABASES['default']['CONN_MAX_AGE']=500
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
