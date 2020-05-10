@@ -73,7 +73,7 @@ class User(AbstractBaseUser,PermissionsMixin):
 
       @property
       def is_staff(self):
-            return self.staff
+            return self.staff or self.admin
 
 
       @property

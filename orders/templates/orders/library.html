@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+
+
+{% block content %}
+
+      <div class="row">
+            <div class="col-12">
+                  <h1>Products</h1>
+            </div>
+      </div>
+      <div class="row">
+            <div class="col">
+                  <div class="table">
+                        <thead><th>Product </th><th>Order id</th><th>Download</th></thead>
+                  
+                        <tbody>
+                              {% for object in object_list %}
+
+                                    <tr>
+                                          <td><a href="{{object.product.get_absolute_url}}">{{object.product.title}}</a></td>
+                                          <td><a href="#">Order {{object.order_id}}</a></td>
+                                          <br>
+                                                {% for download in object.get_downloads %}
+                                                    <a href="{{downalod.get_download_url}}">{{download.name}}</a>   </br>
+                                                {% endfor %}
+                                          </td>
+                                          
+                                    </tr>
+
+                              {% endfor %}
+                        </tbody>
+                  </div>
+            </div>
+      </div>
+
+{% endblock content %}

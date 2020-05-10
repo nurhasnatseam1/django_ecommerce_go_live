@@ -2,11 +2,14 @@ import os
 from django.db import models
 import random
 from django.urls import reverse
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
+from django.urls import reverse
 from django.db.models import Q
 from django.db.models.signals import post_save,pre_save
 from .utils import random_stirng_generator,unique_slug_generator 
 # Create your models here.
-
+from ecommerce.utils import get_filename
 
 
 
@@ -18,6 +21,14 @@ def get_filename_ext(filename):
       return name,ext
 
 def uploadImagePath(instance, filename):
+
+      print(filename)
+      new_filename=random.randint(1,99999999)
+      name,ext=get_filename_ext(filename)
+      final_filename=f"products/{instance.id}/{new_filename}.{ext}"
+      return final_filename
+
+def uploadFilePath(instance, filename):
 
       print(filename)
       new_filename=random.randint(1,99999999)
@@ -72,6 +83,7 @@ class Product(models.Model):
       featured    = models.BooleanField(default=False)
       active      = models.BooleanField(default=True)
       timestamp   = models.DateTimeField(auto_now_add=True)
+      is_digital  = models.BooleanField(default=False)
 
 
       objects=ProductModelManager()
@@ -82,6 +94,12 @@ class Product(models.Model):
       def get_absolute_url(self):
             return reverse("products:detail",kwargs={"slug":self.slug})
 
+      def get_downlaods(self):
+            qs=self.productfile_set.all()
+            return qs
+
+      def get_absolute_url(self):
+            return reverse('products:detail')
 
 
 def pre_save_receiver(sender,instance,*args,**kwargs):
@@ -90,3 +108,40 @@ def pre_save_receiver(sender,instance,*args,**kwargs):
       
 
 pre_save.connect(pre_save_receiver,sender=Product)
+
+def upload_product_file_loc(instance,filename):
+      """it does not have instance.id"""
+      slug=instance.product.slug 
+      if slug:
+            location="product/{slug}/"
+      else:
+            slug=unique_slug_generator(instance.product)
+            location = "product/{slug}"
+      return location + filename
+
+
+class ProductFile(models.Model):
+      product     = models.ForeignKey(Product,on_delete=models.CASCADE)
+      file        = models.FileField(
+            upload_to=upload_product_file_loc,
+            storage=FileSystemStorage(location=settings.PROTECTED_ROOT)
+            )# overrideing default storage settings of going to the  media root with this settings but this is not specifying to use a secure url the url wil still at /media/ endpoint because of static url settings in urls.py
+      free       = models.BooleanField(default=False)
+      user_required=models.BooleanField(default=False)
+
+
+
+      def __str__(self):
+            return str(self.file.name)
+
+
+      def get_default_url(self):
+            return self.product.get_absolute_url()
+
+
+      def get_download_url(self):
+            return reverse('orders:download',kwargs={"slug":self.product.slug,"pk":self.pk})
+
+      @property 
+      def name(self):
+            return get_filename(self.file.name)

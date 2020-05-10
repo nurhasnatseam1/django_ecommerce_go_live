@@ -1,5 +1,47 @@
 $(document).ready(function(){
       var productForm=$('.form-product-ajax')
+
+
+
+      function getOwnedProduct(productId,SubmitSpan){
+            //get if this digital product is already owned by the requested billing_profile 
+            $.ajax({
+                  url:"/orders/endpoint/verify/ownership/",
+                  httpMethod:'GET',
+                  data:{product_id:productId},
+                  success:function(data){
+                        console.log(data)
+                        if (data.owner){
+                              submitSpan.html("<a href='/library/' >In library</a>")
+                              return true
+                        }else{
+                              return false
+                        }
+                  },
+                  error:function(error){
+                        console.log(error)
+                  }
+            })
+      }
+
+      $.each(productForm,function(index,object){
+            var $this=$(this)
+            var submitSpan=$this.find(".submit-span")
+            var productInput=$this.find("[name='product']")
+            var isUser=$this.attr("data-user")
+            var ptoductId=productInput.attr('value')
+            var ptoductIsDigital=productInput.attr('data-is-digital')
+
+            var isOwmed;
+            if (productIsDigital && isUser){
+                  var isOwned=getOwnedProduct(productId,submitSpan)
+                  if(isOwned){
+                        submitSpan.html("<a href='/library/' >In library</a>")
+                  }
+            }
+            
+      })
+
       productForm.submit(function(event){
             event.preventDefault()
             console.log('form submitted but nothing happened')
@@ -16,9 +58,9 @@ $(document).ready(function(){
                         console.log(data)
                         var submitSpan=thisForm.find('.submit-span')
                         if (data.added){
-                              submitSpan.html('In cart<button type="submit" class="btn btn-danger" >remove from  cart</button>')
+                              submitSpan.html('<a href="/cart"  >In cart</a> <button type="submit" class="btn btn-danger" >remove from  cart</button>')
                         }else{
-                              submitSpan.html('In cart<button type="submit" class="btn btn-success" >add to cart</button>')
+                              submitSpan.html('In cart <button type="submit" class="btn btn-success" >add to cart</button>')
                         }
 
                         var currentPath=window.location.href;

@@ -75,6 +75,9 @@ def checkout_home(request):
       address_form=AddressModelForm()
       billing_address_form=AddressModelForm()
 
+      shipping_address_required=not cart_obj.is_digital
+
+
       billing_address_id=request.session.get('billing_address_id',None)
       shipping_address_id=request.session.get('shipping_address_id',None)
 
@@ -129,5 +132,6 @@ def checkout_home(request):
             "address_qs":address_qs,
             "has_card":has_card,
             "publish_key":STRIPE_PUB_KEY,
+            "shipping_address_required":shipping_address_required,
             }
       return render(request,'cart/checkout.html',context)

@@ -48,6 +48,16 @@ class Cart(models.Model):
             return  str(self.id) 
 
 
+      @property 
+      def is_digital(self):
+            """if all products of the card is digital or not
+            if there is any non digital product then it would return False
+             """
+            qs=self.products.all()
+            new_qs=qs.filter(is_digital=False)
+            if new_qs.exists():
+                  return False 
+            return True
 
 
 
