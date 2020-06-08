@@ -24,7 +24,7 @@ from billing.views import payment_method_view,payment_method_create_view
 from accounts.views import login_page,register_page,guest_login_view
 from cart.views import cart_home,cart_detail_api_view
 from address.views import checkout_address_create_view,checkout_address_reuse_view
-from orders.views import order_sucess,LibraryView
+from orders.views import order_sucess,LibraryView,VerifyOwnership
 from analytics.views import SalesView
 urlpatterns = [
     path("",base,name='base'),
@@ -37,6 +37,7 @@ urlpatterns = [
     path("checkout/address/reuse/",checkout_address_reuse_view,name="checkout-address-reuse"),
     path("order/success",order_sucess,name="order-success"),
     path("order/",include('orders.urls')),
+    path("orders/endpoint/verify/ownership/",VerifyOwnership.as_view(),name='verifyOwnership'),
     path("library/",LibraryView.as_view(),name='library'),
     path("api/cart/",cart_detail_api_view,name='cart-api'),
     path('billing/payment-method/',payment_method_view,name='billing-payment-method'),

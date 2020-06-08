@@ -140,7 +140,7 @@ class Card(models.Model):
 
 def post_save_card_receiver(sender,instance,created,*args,**kwargs):
     if instance.default:
-        billing_profile=instance 
+        billing_profile=instance.billing_profile
         qs=Card.objects.filter(billing_profile=billing_profile).exclude(pk=instance.pk)
         qs.update(default=False)
 
@@ -162,7 +162,7 @@ class ChargeManager(models.Manager):
             amount=int(order_obj.order_total*100), #pass dollar in cents
             currency='usd',
             customer=billing_profile.customer_id,
-            source=card_obj .stripe_card_id,
+            source=card_obj.stripe_card_id,
             description=f"Charge for {billing_profile.email}",
             metadata={
                 'order_id':order_obj.order_id
@@ -187,7 +187,7 @@ class Charge(models.Model):
     billing_profile     =models.ForeignKey(BillingProfile,on_delete=models.DO_NOTHING)
     stripe_card_id      =models.CharField(max_length=120)
     paid                =models.BooleanField(default=True)
-    refunded            =models.BooleanField(default=True)
+    refunded            =models.BooleanField(default=False)
     outcome             =models.TextField(null=True,blank=True)
     outcome_type        =models.CharField(max_length=120,null=True,blank=True)
     seller_message      =models.CharField(max_length=120,null=True,blank=True)

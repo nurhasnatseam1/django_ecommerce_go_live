@@ -117,7 +117,7 @@ def checkout_home(request):
                         del request.session['cart_id']
                         if not billing_profile.user:
                               billing_profile.set_cards_inactive()
-                        del request.session['guest_email_id']
+                              del request.session['guest_email_id']
                         return redirect('/order/success') 
                   else:
                         print('charge was not paid to stripe via card')  

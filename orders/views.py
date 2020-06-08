@@ -4,7 +4,7 @@ from django.http import Http404 ,HttpResponse
 from django.views.generic import View, ListView, DetailView 
 from django.shortcuts import render 
 from django.contrib import messages
-
+from django.http import JsonResponse
 
 
 
@@ -13,7 +13,7 @@ import os
 from wsgiref.util import FileWrapper 
 from django.conf import settings 
 from mimetypes import guess_type
-from products.mdoels import 
+from products.models import Product
 
 
 from billing.models import BillingProfile 
@@ -119,8 +119,8 @@ class VerifyOwnership(View):
 
             if product_id is not None:
                   product_id = int(product_id)
-            ownership_ids=ProductPurchase.objects.products_ by_id(request)
+            ownership_ids=ProductPurchase.objects.products_by_id(request)
             if product_id in ownership_ids:
                   return JsonResponse({'owner':True})
             return JsonResponse({'owner':False})
-      raise Http404
+            raise Http404

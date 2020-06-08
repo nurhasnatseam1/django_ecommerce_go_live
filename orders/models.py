@@ -57,7 +57,7 @@ class OrderManagerQuerySet(models.query.QuerySet):
             shipped_data=shipped.total_data()
             paid=recent.by_status(status='paid')
             data={
-                  'recent':recent,
+                  'recent':recentself.cart.products.all(),
                   'recent_data':recent_data,
                   'recent_cart_data':recent_cart_data,
                   'shipped':shipped,
@@ -248,11 +248,17 @@ class ProductPurchaseManager(models.Manager):
             product_qs = Product.objects.filter(id__in = ids_).distinct()
             return product_qs
 
+      def products_by_id(self,request):
+            """returning all the unique digital  products owned by a single billing_profile , you get the billing profile by the request  """
+            qs=self.by_request(request).digital()
+            ids_ = [x.product.id for x in qs]
+            return ids_
+
 
 
 
 class ProductPurchase(models.Model):
-      order             = models.CharField(max_length=120)
+      order_id          = models.CharField(max_length=120)
       billing_profile   = models.ForeignKey(BillingProfile,on_delete=models.DO_NOTHING)
       product           = models.ForeignKey(Product,on_delete=models.DO_NOTHING)  #even though product is a foreign key the one productPurchase instance can only have one product instance associated with it
       refunded          = models.BooleanField(default=False)

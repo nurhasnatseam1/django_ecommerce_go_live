@@ -161,8 +161,14 @@ class EmailActivationForLogin(models.Model):
                               "email":self.email
                         }
                         subject='1-Click Email varification'
-                        txt_ = get_template('registration/emails/verify.txt').render(context)
-                        html_=get_template('registration/emails/verify.html').render(context)
+                        txt_ = get_template('registration/emails/verify.txt').render({
+                              "path":path,
+                              "email":self.email
+                        })
+                        html_=get_template('registration/emails/verify.html').render({
+                              "path":path,
+                              "email":self.email
+                        })
                         from_email='nurhasnatseam2@gmail.com'
                         receipient_list=[self.email]            
                         sent_mail=send_mail(

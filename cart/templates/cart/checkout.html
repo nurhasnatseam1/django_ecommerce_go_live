@@ -1,21 +1,19 @@
 {% extends 'base.html' %}
-{% url 'login' as login_url  %}
-{% url 'guest_login' as guest_login_url %} these will not be read by django template engine 
-{% block content %}
 
+{% block content %}
+{% url 'accounts:login' as login_url  %}
+{% url 'accounts:guest_login' as guest_login_url %} 
 
 order_id:{{object.id}}
-cart_id:{{object.cart.id}}
+cart_id:{{cart.id}}
 {% if not billing_profile %}
       <div class="row">
             <div class="col-12 col-md-6">
                   <h2 class="lead" >proceed as authenticated</h2>
-                  {% url 'login' as login_url  %}
-                  {% include 'cart/snippets/form.html' with form=login_form  next=request.build_absolute_uri action_url=login_url %}    {% comment %} build absolute uri = root relative uri{% endcomment %}
+                  {% include 'cart/snippets/form.html' with form=login_form  next=request.build_absolute_uri action_url=login_url %}    
             </div>
             <div class="col-12 col-md-6">
                   <h2 class="lead" >proceed as guest</h2>
-                  {% url 'guest_login' as guest_login_url %}
                   {% include 'cart/snippets/form.html' with form=guest_form  next=request.build_absolute_uri action_url=guest_login_url %}
             </div>
       </div>
@@ -74,7 +72,7 @@ cart_id:{{object.cart.id}}
                   <p>billing_address:{{object.billing_address.address_line_2}}</p>
                   <p>Cart total:{{object.cart.total}}</p>
                   <p>Shipping Total:{{object.shipping_total}}</p>
-                  <p>payment method:{{billing_profile.get_default_card}} <a href="{url 'billing-payment-method'}?next={{request.build_absolute_uri}}">change payment method</a></p>
+                  <p>payment method:{{billing_profile.get_default_card}} <a href="{% url 'billing-payment-method'  %}?next={{request.build_absolute_uri}}">change payment method</a></p>
                   <p>Order Total:{{object.order_total}}</p>
                   <form action="" method="POST">
                         {% csrf_token %}

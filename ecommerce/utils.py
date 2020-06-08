@@ -1,7 +1,7 @@
 import random 
 import string
 from django.utils.text import slugify
-from datetime
+import datetime
 def random_string_generator(size=4,chars=string.ascii_lowercase+string.digits):
       return ''.join(random.choice(chars) for _ in range(size))
 
@@ -81,7 +81,7 @@ def get_last_month_data(today):
       simple method to get the ddatetime objects for the start and end of last month 
       """
       this_month_data=datetime.datetime(today.year,today.month,1) #first day of this month
-      last month_end=this_month_start - datetime.timedelta(days=1)
+      last_month_end=this_month_start - datetime.timedelta(days=1)
       last_month_start=datetime.datetime(last_month_end.year,last_month_end.month,1) #first day of previous month
       return (last_month_start,last_month_end)
 

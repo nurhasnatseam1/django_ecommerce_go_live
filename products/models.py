@@ -99,7 +99,7 @@ class Product(models.Model):
             return qs
 
       def get_absolute_url(self):
-            return reverse('products:detail')
+            return reverse('products:detail',kwargs={'slug':self.slug})
 
 
 def pre_save_receiver(sender,instance,*args,**kwargs):
@@ -113,10 +113,10 @@ def upload_product_file_loc(instance,filename):
       """it does not have instance.id"""
       slug=instance.product.slug 
       if slug:
-            location="product/{slug}/"
+            location=f"/product/{slug}/"
       else:
             slug=unique_slug_generator(instance.product)
-            location = "product/{slug}"
+            location = f"product/{slug}"
       return location + filename
 
 
